@@ -18,7 +18,8 @@ public:
         KANNALA_BRANDT,
         MEI,
         PINHOLE,
-        SCARAMUZZA
+        SCARAMUZZA,
+        FLEXIBLE_PINHOLE
     };
 
     class Parameters

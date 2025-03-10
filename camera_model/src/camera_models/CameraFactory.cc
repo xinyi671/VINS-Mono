@@ -7,6 +7,7 @@
 #include "camodocal/camera_models/EquidistantCamera.h"
 #include "camodocal/camera_models/PinholeCamera.h"
 #include "camodocal/camera_models/ScaramuzzaCamera.h"
+#include "camodocal/camera_models/FlexiblePinholeCamera.h"
 
 #include "ceres/ceres.h"
 
@@ -118,6 +119,11 @@ CameraFactory::generateCameraFromYamlFile(const std::string& filename)
         {
             modelType = Camera::PINHOLE;
         }
+        else if (boost::iequals(sModelType, "flexible_pinhole"))
+        {
+            modelType = Camera::FLEXIBLE_PINHOLE;
+            std::cout << "ModelType: " << sModelType << std::endl;
+        }
         else
         {
             std::cerr << "# ERROR: Unknown camera model: " << sModelType << std::endl;
@@ -160,6 +166,14 @@ CameraFactory::generateCameraFromYamlFile(const std::string& filename)
         CataCameraPtr camera(new CataCamera);
 
         CataCamera::Parameters params = camera->getParameters();
+        params.readFromYamlFile(filename);
+        camera->setParameters(params);
+        return camera;
+    }
+    case Camera::FLEXIBLE_PINHOLE:
+    {
+        FlexiblePinholeCameraPtr camera(new FlexiblePinholeCamera);
+        FlexiblePinholeCamera::Parameters params = camera->getParameters();
         params.readFromYamlFile(filename);
         camera->setParameters(params);
         return camera;
