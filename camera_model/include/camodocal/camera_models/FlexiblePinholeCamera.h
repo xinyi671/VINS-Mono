@@ -7,6 +7,8 @@
 
 #include "ceres/rotation.h"
 #include "Camera.h"
+#include <iostream>
+
 
 namespace camodocal
 {

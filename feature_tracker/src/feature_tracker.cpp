@@ -78,6 +78,7 @@ void FeatureTracker::addPoints()
     }
 }
 
+std::map<int, cv::Point2f> prevPtsMap; 
 void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
 {
     cv::Mat img;
@@ -164,6 +165,21 @@ void FeatureTracker::readImage(const cv::Mat &_img, double _cur_time)
     cur_pts = forw_pts;
     undistortedPoints();
     prev_time = cur_time;
+
+     
+    
+    
+    if (PUB_THIS_FRAME) {
+        drawTrack(cur_img, ids, cur_pts, prevPtsMap);
+    }
+
+    prevPtsMap.clear();
+    for (size_t i = 0; i < forw_pts.size(); i++) {
+        if (ids[i] != -1) {
+            prevPtsMap[ids[i]] = forw_pts[i];
+        }
+    }
+     
 }
 
 void FeatureTracker::rejectWithF()
@@ -253,6 +269,39 @@ void FeatureTracker::showUndistortion(const string &name)
     }
     cv::imshow(name, undistortedImg);
     cv::waitKey(0);
+}
+
+void FeatureTracker::drawTrack(const cv::Mat& imLeft,vector<int>& curLeftIds,
+    vector<cv::Point2f>& curLeftPts, map<int, cv::Point2f>& prevLeftPtsMap) {
+    int rows = imLeft.rows;
+    int cols = imLeft.cols;
+
+    imTrack = imLeft.clone();
+    cv::cvtColor(imTrack, imTrack, cv::COLOR_GRAY2RGB);
+
+    for (size_t j = 0; j < curLeftPts.size(); j++) {
+        double len = std::min(1.0, 1.0 * track_cnt[j] / 20);
+        cv::circle(imTrack, curLeftPts[j], 2, cv::Scalar(255 * (1 - len), 0, 255 * len), 2);
+    }
+
+    map<int, cv::Point2f>::iterator mapIt;
+    for (size_t i = 0; i < curLeftIds.size(); i++) {
+        int id = curLeftIds[i];
+        // ROS_ERROR("Looking for ID: %d", id);
+        mapIt = prevLeftPtsMap.find(id);
+        if (mapIt != prevLeftPtsMap.end()) {
+        //   ROS_ERROR("plot arrow for ID: %d", id);
+        //   ROS_ERROR("plot arrow for ID: %d, curLeftPts[%zu]=(%f,%f), prevLeftPts=(%f,%f)", 
+            //   id, i, curLeftPts[i].x, curLeftPts[i].y, mapIt->second.x, mapIt->second.y);
+          cv::arrowedLine(imTrack, curLeftPts[i], mapIt->second, cv::Scalar(0, 255, 0), 1, 8, 0, 0.2);
+        } else {
+        //   ROS_ERROR("ID not found in prevLeftPtsMap: %d", id);
+        }
+      }
+    
+    // ROS_ERROR("plt!");
+    cv::imshow("tracking", imTrack);
+    cv::waitKey(2);
 }
 
 void FeatureTracker::undistortedPoints()

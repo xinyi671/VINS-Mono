@@ -181,6 +181,10 @@ bool LinearAlignment(map<double, ImageFrame> &all_image_frame, Vector3d &g, Vect
     ROS_DEBUG("estimated scale: %f", s);
     g = x.segment<3>(n_state - 4);
     ROS_DEBUG_STREAM(" result g     " << g.norm() << " " << g.transpose());
+    // ROS_INFO("estimated scale: %f", s);
+    // ROS_INFO("g: %f %f %f", g(0), g(1), g(2));
+    // ROS_INFO("G: %f %f %f", G(0), G(1), G(2));
+    // ROS_INFO("g_norm() - G.norm() = %f", g.norm() - G.norm());
     if(fabs(g.norm() - G.norm()) > 1.0 || s < 0)
     {
         return false;
@@ -190,6 +194,7 @@ bool LinearAlignment(map<double, ImageFrame> &all_image_frame, Vector3d &g, Vect
     s = (x.tail<1>())(0) / 100.0;
     (x.tail<1>())(0) = s;
     ROS_DEBUG_STREAM(" refine     " << g.norm() << " " << g.transpose());
+    // ROS_INFO("refine scale: %f", s);
     if(s < 0.0 )
         return false;   
     else
@@ -200,8 +205,12 @@ bool VisualIMUAlignment(map<double, ImageFrame> &all_image_frame, Vector3d* Bgs,
 {
     solveGyroscopeBias(all_image_frame, Bgs);
 
-    if(LinearAlignment(all_image_frame, g, x))
+    if(LinearAlignment(all_image_frame, g, x)){
+        // std::cout << "LinearAlignment success" << std::endl;
         return true;
-    else 
+    }
+    else{ 
+        // std::cout << "LinearAlignment failed" << std::endl;
         return false;
+    }
 }

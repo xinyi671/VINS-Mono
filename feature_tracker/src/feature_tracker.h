@@ -46,6 +46,9 @@ class FeatureTracker
 
     void undistortedPoints();
 
+    void drawTrack(const cv::Mat& imLeft,vector<int>& curLeftIds,
+      vector<cv::Point2f>& curLeftPts, map<int, cv::Point2f>& prevLeftPtsMap);
+
     cv::Mat mask;
     cv::Mat fisheye_mask;
     cv::Mat prev_img, cur_img, forw_img;
@@ -57,6 +60,7 @@ class FeatureTracker
     vector<int> track_cnt;
     map<int, cv::Point2f> cur_un_pts_map;
     map<int, cv::Point2f> prev_un_pts_map;
+    cv::Mat imTrack;
     camodocal::CameraPtr m_camera;
     double cur_time;
     double prev_time;

@@ -41,16 +41,11 @@ docker run \
   -v ${VINS_MONO_DIR}:/root/catkin_ws/src/VINS-Mono/ \
   ros:vins-mono \
   /bin/bash -c \
-  "cd /root/catkin_ws/; \
-  catkin config \
-        --env-cache \
-        --extend /opt/ros/$ROS_DISTRO \
-       --cmake-args \
-         -DCMAKE_BUILD_TYPE=Release; \
-     catkin build; \
-     source devel/setup.bash; \
-     roslaunch vins_estimator ${1}"
-
+cd /root/catkin_ws/
+catkin config --env-cache --extend /opt/ros/$ROS_DISTRO --cmake-args -DCMAKE_BUILD_TYPE=Release
+catkin build
+source devel/setup.bash
+roslaunch vins_estimator ${1}
 wait $ROSCORE_PID
 wait $RVIZ_PID
 

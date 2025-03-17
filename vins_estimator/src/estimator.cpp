@@ -163,6 +163,7 @@ void Estimator::processImage(const map<int, vector<pair<int, Eigen::Matrix<doubl
             if( ESTIMATE_EXTRINSIC != 2 && (header.stamp.toSec() - initial_timestamp) > 0.1)
             {
                result = initialStructure();
+            //    ROS_INFO("initial structure result %d", result);
                initial_timestamp = header.stamp.toSec();
             }
             if(result)
@@ -446,6 +447,7 @@ bool Estimator::relativePose(Matrix3d &relative_R, Vector3d &relative_T, int &l)
     {
         vector<pair<Vector3d, Vector3d>> corres;
         corres = f_manager.getCorresponding(i, WINDOW_SIZE);
+        // ROS_INFO("corres size %d", static_cast<int>(corres.size()));
         if (corres.size() > 20)
         {
             double sum_parallax = 0;
@@ -459,6 +461,7 @@ bool Estimator::relativePose(Matrix3d &relative_R, Vector3d &relative_T, int &l)
 
             }
             average_parallax = 1.0 * sum_parallax / int(corres.size());
+            // ROS_INFO("average_parallax %f", average_parallax * 460);
             if(average_parallax * 460 > 30 && m_estimator.solveRelativeRT(corres, relative_R, relative_T))
             {
                 l = i;
